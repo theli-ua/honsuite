@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="pref_check_update">Check for updates on start</string>
+	<string name="pref_check_update_summ">Will query patch server on app startup t check for a new patch version</string>
+    <string name="app_name">HoN Suite</string>
+    <string name="title_item_detail">Item Detail</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="download_files_new">There is no HoN data files version downloaded at the moment. Would you like to download latest version now?</string>
+    <string name="download_files_continue">HoN data files for version %s are not fully downloaded at the moment. Would you like to continue downloading?</string>
+
+</resources>
