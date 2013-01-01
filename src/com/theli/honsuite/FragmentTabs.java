@@ -1,22 +1,7 @@
-/*
- * Copyright (C) 2011 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.theli.honsuite;
 
-
 import java.util.HashMap;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -24,20 +9,20 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.widget.TabHost;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
+
+import com.github.rtyley.android.sherlock.roboguice.activity.RoboSherlockFragmentActivity;
 
 /**
  * This demonstrates how you can implement switching between the tabs of a
  * TabHost through fragments.  It uses a trick (see the code below) to allow
  * the tabs to switch between fragments instead of simple views.
  */
-public class FragmentTabs extends SherlockFragmentActivity {
+public class FragmentTabs extends RoboSherlockFragmentActivity {
     TabHost mTabHost;
     TabManager mTabManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(SampleList.THEME); //Used for theme switching in samples
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.fragment_tabs);
@@ -48,14 +33,7 @@ public class FragmentTabs extends SherlockFragmentActivity {
 
         mTabManager.addTab(mTabHost.newTabSpec("motd").setIndicator("MOTD"),
                 MotdActivity.MotdFragment.class, null);
-        /*mTabManager.addTab(mTabHost.newTabSpec("contacts").setIndicator("Contacts"),
-                LoaderCursorSupport.CursorLoaderListFragment.class, null);
-        mTabManager.addTab(mTabHost.newTabSpec("custom").setIndicator("Custom"),
-                LoaderCustomSupport.AppListFragment.class, null);
-        mTabManager.addTab(mTabHost.newTabSpec("throttle").setIndicator("Throttle"),
-                LoaderThrottleSupport.ThrottledLoaderListFragment.class, null);
-                */
-
+        
         if (savedInstanceState != null) {
             mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
         }

@@ -7,31 +7,30 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import org.lorecraft.phparser.SerializedPhpParser;
-
 import android.os.AsyncTask;
 
-public final class MasterServerRequest extends AsyncTask<Void, Void, Object> {
+public final class URLRequester extends AsyncTask<URL, Void, String> {
 	String postData;
 	String script;
 	
-	public MasterServerRequest(String script)
+	public URLRequester(String script)
 	{
 		this.postData = null;
 		this.script = script;
 	}
-	public MasterServerRequest(String script, String postData)
+	public URLRequester(String script, String postData)
 	{
 		this.postData = postData;
 		this.script = script;
 	}
 	
 	@Override
-	protected Object doInBackground(Void... params) {
+	protected String doInBackground(URL... urls) {
 		StringBuffer response = new StringBuffer();
 		try {
-			URL url = new URL("http://" + Globals.HON_MASTERSERVER + "/"
-					+ script);
+			//URL url = new URL("http://" + Globals.HON_MASTERSERVER + "/"
+					//+ script);
+			URL url = urls[0];
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			if (postData != null) {
 				conn.setRequestMethod("POST");
@@ -61,9 +60,6 @@ public final class MasterServerRequest extends AsyncTask<Void, Void, Object> {
 		} catch (Exception e) {
 			return null;
 		}
-		return (new SerializedPhpParser(response.toString())).parse();
-	}
-	@Override
-	protected void onPostExecute(Object obj){
+		return response.toString();
 	}
 }

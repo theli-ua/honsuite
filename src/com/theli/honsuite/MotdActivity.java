@@ -1,4 +1,5 @@
 package com.theli.honsuite;
+import roboguice.inject.InjectView;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
@@ -6,11 +7,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.github.rtyley.android.sherlock.roboguice.activity.RoboSherlockFragmentActivity;
+import com.github.rtyley.android.sherlock.roboguice.fragment.RoboSherlockFragment;
 
 
-public class MotdActivity extends SherlockFragmentActivity {
+public class MotdActivity extends RoboSherlockFragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,13 +26,8 @@ public class MotdActivity extends SherlockFragmentActivity {
         }
     }
 
-    public static class MotdFragment extends SherlockFragment {
-        int mNum;
-
-        /**
-         * Create a new instance of CountingFragment, providing "num"
-         * as an argument.
-         */
+    public static class MotdFragment extends RoboSherlockFragment {
+        @InjectView(R.id.text)             TextView content;
         static MotdFragment newInstance(int num) {
             MotdFragment f = new MotdFragment();
 
