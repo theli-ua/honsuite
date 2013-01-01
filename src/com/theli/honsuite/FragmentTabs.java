@@ -46,11 +46,10 @@ public class FragmentTabs extends SherlockFragmentActivity {
 
         mTabManager = new TabManager(this, mTabHost, R.id.realtabcontent);
 
-        mTabManager.addTab(mTabHost.newTabSpec("simple").setIndicator("Simple"),
-                FragmentStackSupport.CountingFragment.class, null);
-        mTabManager.addTab(mTabHost.newTabSpec("contacts").setIndicator("Contacts"),
+        mTabManager.addTab(mTabHost.newTabSpec("motd").setIndicator("MOTD"),
+                MotdActivity.MotdFragment.class, null);
+        /*mTabManager.addTab(mTabHost.newTabSpec("contacts").setIndicator("Contacts"),
                 LoaderCursorSupport.CursorLoaderListFragment.class, null);
-        /*
         mTabManager.addTab(mTabHost.newTabSpec("custom").setIndicator("Custom"),
                 LoaderCustomSupport.AppListFragment.class, null);
         mTabManager.addTab(mTabHost.newTabSpec("throttle").setIndicator("Throttle"),
