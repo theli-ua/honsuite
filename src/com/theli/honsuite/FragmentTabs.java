@@ -12,21 +12,24 @@ import android.widget.TabHost;
 
 import com.github.rtyley.android.sherlock.roboguice.activity.RoboSherlockFragmentActivity;
 
+
+import roboguice.inject.InjectView;
+import roboguice.inject.ContentView;
+
 /**
  * This demonstrates how you can implement switching between the tabs of a
  * TabHost through fragments.  It uses a trick (see the code below) to allow
  * the tabs to switch between fragments instead of simple views.
  */
+@ContentView(R.layout.fragment_tabs)
 public class FragmentTabs extends RoboSherlockFragmentActivity {
-    TabHost mTabHost;
+    @InjectView(android.R.id.tabhost)	TabHost mTabHost;
     TabManager mTabManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.fragment_tabs);
-        mTabHost = (TabHost)findViewById(android.R.id.tabhost);
         mTabHost.setup();
 
         mTabManager = new TabManager(this, mTabHost, R.id.realtabcontent);

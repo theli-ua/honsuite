@@ -2,7 +2,7 @@
 <resources>
 <string name="new_fragment">New fragment</string>
 	<string name="pref_check_update">Check for updates on start</string>
-	<string name="pref_check_update_summ">Will query patch server on app startup t check for a new patch version</string>
+	<string name="pref_check_update_summ">Will query patch server on app startup to check for a new patch version</string>
     <string name="app_name">HoN Suite</string>
     <string name="title_item_detail">Item Detail</string>
     <string name="hello_world">Hello world!</string>
@@ -10,5 +10,6 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="download_files_new">There is no HoN data files version downloaded at the moment. Would you like to download latest version now?</string>
     <string name="download_files_continue">HoN data files for version %s are not fully downloaded at the moment. Would you like to continue downloading?</string>
-	<string name="hello_world"><b>Hello, <i>World!</i></b></string>
+    <string name="motd_error">Error querying MOTD</string>
+    <string name="motd_parsing_error">Error parsing MOTD response</string>
 </resources>
