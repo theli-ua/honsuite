@@ -53,6 +53,6 @@ public class Utils {
 			}
 		}
 		
-		return output.toString();	
+		return output.toString().replaceAll("\n", "<br/>");	
 	}
 }

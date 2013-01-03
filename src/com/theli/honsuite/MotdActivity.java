@@ -49,7 +49,6 @@ public class MotdActivity extends RoboSherlockFragmentActivity {
             try {
             	motdData = (LinkedHashMap<?, ?>)(new SerializedPhpParser(str)).parse();
             	str = (String)motdData.get("motddata");
-            	str = str.replaceAll("\n", "<br/>");
             	String[] motds = str.split("\\|");
             	StringBuilder sb = new StringBuilder();
             	for(String motd : motds)
