@@ -12,4 +12,6 @@
     <string name="download_files_continue">HoN data files for version %s are not fully downloaded at the moment. Would you like to continue downloading?</string>
     <string name="motd_error">Error querying MOTD</string>
     <string name="motd_parsing_error">Error parsing MOTD response</string>
+    <string name="continue_download">Would you like to continue downloading version %s now?</string>
+    <string name="update_possible">Would you like to update to version %s now?</string>
 </resources>

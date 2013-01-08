@@ -1,13 +1,12 @@
 package com.theli.honsuite;
 
-import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 import roboguice.util.SafeAsyncTask;
+import roboguice.util.Strings;
 
 public abstract class URLRequester extends SafeAsyncTask<String> {
 	String postData;
@@ -25,7 +24,6 @@ public abstract class URLRequester extends SafeAsyncTask<String> {
 
 	@Override
 	public String call() throws Exception {
-		StringBuffer response = new StringBuffer();
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		if (postData != null) {
 			conn.setRequestMethod("POST");
@@ -44,13 +42,6 @@ public abstract class URLRequester extends SafeAsyncTask<String> {
 			wr.close();
 		}
 		InputStream is = conn.getInputStream();
-		BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-		String line;
-		while ((line = rd.readLine()) != null) {
-			response.append(line);
-			response.append(System.getProperty("line.separator"));
-		}
-		rd.close();
-		return response.toString();
+		return Strings.toString(is);
 	}
 }

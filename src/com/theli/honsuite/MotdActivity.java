@@ -49,6 +49,7 @@ public class MotdActivity extends RoboSherlockFragmentActivity {
             try {
             	motdData = (LinkedHashMap<?, ?>)(new SerializedPhpParser(str)).parse();
             	str = (String)motdData.get("motddata");
+            	str = str.replaceAll("\n", "<br/>");
             	String[] motds = str.split("\\|");
             	StringBuilder sb = new StringBuilder();
             	for(String motd : motds)
@@ -107,10 +108,6 @@ public class MotdActivity extends RoboSherlockFragmentActivity {
 			}
         }
 
-        /**
-         * The Fragment's UI is just a simple text view showing its
-         * instance number.
-         */
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
