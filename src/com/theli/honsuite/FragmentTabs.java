@@ -3,6 +3,7 @@ package com.theli.honsuite;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipException;
@@ -54,7 +55,6 @@ public class FragmentTabs extends RoboSherlockFragmentActivity {
 		}
 		if (bCheckUpdate || bContinue) {
 			try {
-				// https://www.heroesofnewerth.com/gen/client_motd.php
 				new URLRequester(new URL(Globals.HON_NA_MASTERSERVER
 						+ Globals.HON_MASTERSERVER_PATCHER_PATH),
 						"version=0.0.0.0&os=wac&arch=i686") {
@@ -89,29 +89,56 @@ public class FragmentTabs extends RoboSherlockFragmentActivity {
 		File newManifestFile = new File(new File(getExternalFilesDir(null), ".tmp"),"manifest.xml.zip");
 		HoNManifest newManifest;
 		HoNManifest oldManifest;
-		if (!newManifestFile.exists()) {
-			if (manifestFile.exists()) {
-				try {
-					ZipFile zip = new ZipFile(manifestFile);
-					oldManifest = new HoNManifest(zip.getInputStream(zip.getEntry("manifest.xml")));
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					oldManifest = new HoNManifest();
-				}
-			} 
-			else
-			{
+		if (manifestFile.exists()) {
+			try {
+				ZipFile zip = new ZipFile(manifestFile);
+				oldManifest = new HoNManifest(zip.getInputStream(zip.getEntry("manifest.xml")));
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 				oldManifest = new HoNManifest();
+			}
+		} 
+		else
+		{
+			oldManifest = new HoNManifest();
+		}
+
+		if (!newManifestFile.exists()) {
+			if (oldManifest.version != (String)version.get("version"))
+			{
+				new HoNFileDownloader(
+						Arrays.asList(new HoNManifest.ManifestEntry[]	{
+								new HoNManifest.ManifestEntry(
+										(String)((Map<?,?>)version.get(0)).get("latest_manifest_checksum"),
+										"manifest.xml",
+										(String)version.get("version"),
+										Integer.decode((String)((Map<?,?>)version.get(0)).get("latest_manifest_size"))
+									)}),
+						1,
+						version,
+						new File(getExternalFilesDir(null),".tmp")
+						)
+				{
+				@Override
+				protected void onPostExecute(Integer res) {
+						onNewVersion(getVersionInfo());
+					}
+				}.execute();
+			}
+		}
+		else
+		{
+			try {
+				ZipFile zip = new ZipFile(newManifestFile);
+				newManifest = new HoNManifest(zip.getInputStream(zip.getEntry("manifest.xml")));
+				HoNManifest.DownloadChangeSet changeSet = new HoNManifest.DownloadChangeSet(oldManifest, newManifest);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 	}
-	//protected void processChangeSet()
-	protected void continueDownloading()
-	{
-		
-	}
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

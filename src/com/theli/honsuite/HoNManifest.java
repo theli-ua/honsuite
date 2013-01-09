@@ -1,5 +1,6 @@
 package com.theli.honsuite;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -14,7 +15,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import android.util.Xml;
 
 public class HoNManifest {
-	public class ManifestEntry
+	public static class ManifestEntry
 	{
 		public String checksum;
 		public int size;
@@ -63,6 +64,7 @@ public class HoNManifest {
 	        	int size = Integer.decode(parser.getAttributeValue(null, "size"));
 	        	map.put(p, new ManifestEntry(c,p,v,size));
 	        } 
+	        parser.next();
 	    }  	
 		
 		
@@ -71,7 +73,7 @@ public class HoNManifest {
 	}
 	public HoNManifest()
 	{
-		files = Collections.unmodifiableMap(null);
+		files = Collections.emptyMap();
 	}
 	
 	public HoNManifest(InputStream in)
@@ -79,7 +81,7 @@ public class HoNManifest {
 		try {
 			XmlPullParser parser = Xml.newPullParser();
 			parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-			parser.setInput(in, null);
+			parser.setInput(new BufferedInputStream(in), null);
 			parser.nextTag();
 			parse(parser);
 		} 
@@ -97,7 +99,7 @@ public class HoNManifest {
 			}
 		}
 	}
-	public class DownloadChangeSet
+	public static class DownloadChangeSet
 	{
 		public Set<ManifestEntry> downloads;
 		public Set<ManifestEntry> deletes;
