@@ -1,10 +1,10 @@
 package com.theli.honsuite;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.xml.parsers.SAXParser;
@@ -18,10 +18,10 @@ import org.xml.sax.helpers.DefaultHandler;
 public class HoNManifest extends DefaultHandler {
 	public static class ManifestEntry
 	{
-		public String checksum;
-		public int size;
-		public String path;
-		public String version;
+		public final String checksum;
+		public final int size;
+		public final String path;
+		public final String version;
 		public ManifestEntry(String checksum, String path, String version, int size)
 		{
 			this.path = path;
@@ -40,7 +40,7 @@ public class HoNManifest extends DefaultHandler {
 					&& e.checksum.equals(this.checksum); 
 		}
 	}
-	Map<String,ManifestEntry> files;
+	Collection<ManifestEntry> files;
 	String os;
 	String arch;
 	String version;
@@ -54,7 +54,7 @@ public class HoNManifest extends DefaultHandler {
 	static final String _manifestTag = "manifest";
 	public HoNManifest()
 	{
-		files = Collections.emptyMap();
+		files = Collections.emptyList();
 	}
 	
 	//opening element tag
@@ -68,18 +68,22 @@ public class HoNManifest extends DefaultHandler {
 			this.version = atts.getValue(_versionAttrName);
 			this.arch = atts.getValue(_archAttrName);
 		}
+		/*
 		else if (name.equals(_fileTag))
 		{
-			ManifestEntry e = new ManifestEntry(atts.getValue(_checksumAttrName),
-					atts.getValue(_pathAttrName),atts.getValue(_versionAttrName),
-					Integer.decode(atts.getValue(_sizeAttrName)));
-			this.files.put(e.path, e);
+			//this.files.put(e.path, e);
+			this.files.add(
+					new ManifestEntry(atts.getValue(_checksumAttrName),
+							atts.getValue(_pathAttrName),atts.getValue(_versionAttrName),
+					Integer.decode(atts.getValue(_sizeAttrName)))
+					);
 		}
+		*/
 	}
 	
 	public HoNManifest(InputStream in)
 	{
-		this.files = new HashMap<String,ManifestEntry>();
+		this.files = new ArrayList<ManifestEntry>();
 		try {
 			SAXParserFactory _f = SAXParserFactory.newInstance();
 			SAXParser _p = _f.newSAXParser();
@@ -98,11 +102,10 @@ public class HoNManifest extends DefaultHandler {
 		public Set<ManifestEntry> deletes;
 		public DownloadChangeSet(HoNManifest oldManifest, HoNManifest newManifest)
 		{
-			this.deletes = new HashSet<ManifestEntry>(oldManifest.files.values());
-			this.downloads = new HashSet<ManifestEntry>(newManifest.files.values());
-			this.downloads.removeAll(oldManifest.files.values());
-			this.deletes.removeAll(newManifest.files.values());
+			this.deletes = new HashSet<ManifestEntry>(oldManifest.files);
+			this.downloads = new HashSet<ManifestEntry>(newManifest.files);
+			this.downloads.removeAll(oldManifest.files);
+			this.deletes.removeAll(newManifest.files);
 		}
 	}
-
 }
