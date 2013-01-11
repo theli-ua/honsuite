@@ -7,16 +7,22 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 import roboguice.inject.ContextSingleton;
 
 import android.content.Context;
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+
 import com.google.inject.Inject;
+
+import 	java.util.UUID;
 
 @ContextSingleton
 public class HoNData {
@@ -44,6 +50,16 @@ public class HoNData {
 	private static final String FILE_CHECKSUM = "checksum";
 	private static final String FILE_ZIPSIZE = "zipsize";
 	
+    private static final String FILES_TABLE_CREATE = 
+    		"CREATE TABLE %s (" +
+    		FILE_PATH + " TEXT," +
+    		FILE_SIZE + " INTEGER," +
+    		FILE_ZIPSIZE + " INTEGER," +
+    		FILE_CHECKSUM + " CHECKSUM," +
+    		FILE_VERSION + " TEXT," +
+    		"PRIMARY KEY (" + FILE_PATH + "," + FILE_VERSION + ");";
+	    		
+	    
 	
 
 	private class ManifestTableOpener extends SQLiteOpenHelper
@@ -67,16 +83,6 @@ public class HoNData {
 	    		"CREATE TABLE " + ENTITYTABLE_NAME + " (" +
 	    		ENTITYTABLE_KEY + " TEXT PRIMARY KEY, " + 
 	    		ENTITYTABLE_VALUE + " TEXT );";
-	    
-	    private static final String FILES_TABLE_CREATE = 
-	    		"CREATE TABLE %s (" +
-	    		FILE_PATH + " TEXT," +
-	    		FILE_SIZE + " INTEGER," +
-	    		FILE_ZIPSIZE + " INTEGER," +
-	    		FILE_CHECKSUM + " CHECKSUM," +
-	    		FILE_VERSION + " TEXT," +
-	    		"PRIMARY KEY (" + FILE_PATH + "," + FILE_VERSION + ");";
-	    		
 	    
 		public ManifestTableOpener() {
 			super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -108,16 +114,20 @@ public class HoNData {
 		static final String _archAttrName = "arch";
 		static final String _checksumAttrName = "checksum";
 		static final String _sizeAttrName = "size";
+		static final String _zipsizeAttrName = "zipsize";
 		static final String _fileTag = "file";
 		static final String _manifestTag = "manifest";
 		public HoNManifest()
 		{
-			// files = Collections.emptyList();
+			this.os = null;
+			this.arch = null;
+			this.version = null;
+			this.table = null;
 		}
 
 		//opening element tag
 		@Override
-		public void startElement (String uri, String name, String qName, Attributes atts)
+		public void startElement (String uri, String name, String qName, Attributes atts) throws SAXException
 		{
 			//handle the start of an element
 			if (name.equals(_manifestTag))
@@ -127,19 +137,30 @@ public class HoNData {
 				this.arch = atts.getValue(_archAttrName);
 				
 				//check if table with files for this manifest already exists
-				db.q
+				Cursor c = db.query(MANIFESTS_TABLE_NAME, new String[]{}, "os = ? and version = ? and arch = ?", 
+						new String[] { this.os,this.version,this.arch},
+						null, null, null);
+				if (c.moveToFirst())
+				{
+					this.table = c.getString(0); 
+					throw new SAXException("Manifest already in db");
+				}
+				else
+				{
+					this.table = UUID.randomUUID().toString();
+					db.execSQL(String.format(FILES_TABLE_CREATE, this.table));
+				}
 			}
-			/*
-		else if (name.equals(_fileTag))
-		{
-			//this.files.put(e.path, e);
-			this.files.add(
-					new ManifestEntry(atts.getValue(_checksumAttrName),
-							atts.getValue(_pathAttrName),atts.getValue(_versionAttrName),
-					Integer.decode(atts.getValue(_sizeAttrName)))
-					);
-		}
-			 */
+			else if (name.equals(_fileTag))
+			{
+				ContentValues vals = new ContentValues();
+				vals.put(FILE_CHECKSUM, atts.getValue(_checksumAttrName));
+				vals.put(FILE_PATH, atts.getValue(_pathAttrName));
+				vals.put(FILE_VERSION, atts.getValue(_versionAttrName));
+				vals.put(FILE_SIZE, Integer.decode(atts.getValue(_sizeAttrName)));
+				vals.put(FILE_ZIPSIZE, Integer.decode(atts.getValue(_zipsizeAttrName)));
+				db.insert(this.table, null, vals);
+			}
 		}
 
 		public HoNManifest(InputStream in)
