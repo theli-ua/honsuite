@@ -22,6 +22,7 @@ import android.view.View;
 import android.widget.TabHost;
 
 import com.github.rtyley.android.sherlock.roboguice.activity.RoboSherlockFragmentActivity;
+import com.google.inject.Inject;
 
 import roboguice.inject.InjectView;
 import roboguice.inject.ContentView;
@@ -36,6 +37,7 @@ public class FragmentTabs extends RoboSherlockFragmentActivity {
 	@InjectView(android.R.id.tabhost)
 	TabHost mTabHost;
 	TabManager mTabManager;
+	@Inject HoNData honData;;
 
 	protected void checkForHoNUpdate() {
 		SharedPreferences sharedPref = PreferenceManager
@@ -87,21 +89,21 @@ public class FragmentTabs extends RoboSherlockFragmentActivity {
 		File manifestFile = new File(getExternalFilesDir(null),
 				"manifest.xml.zip");
 		File newManifestFile = new File(new File(getExternalFilesDir(null), ".tmp"),"manifest.xml.zip");
-		HoNManifest newManifest;
-		HoNManifest oldManifest;
+		HoNData.HoNManifest newManifest;
+		HoNData.HoNManifest oldManifest;
 		if (manifestFile.exists()) {
 			try {
 				ZipFile zip = new ZipFile(manifestFile);
-				oldManifest = new HoNManifest(zip.getInputStream(zip.getEntry("manifest.xml")));
+				oldManifest = honData.new HoNManifest(zip.getInputStream(zip.getEntry("manifest.xml")));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				oldManifest = new HoNManifest();
+				oldManifest = honData.new HoNManifest();
 			}
 		} 
 		else
 		{
-			oldManifest = new HoNManifest();
+			oldManifest = honData.new HoNManifest();
 		}
 
 		if (!newManifestFile.exists()) {
@@ -131,8 +133,8 @@ public class FragmentTabs extends RoboSherlockFragmentActivity {
 		{
 			try {
 				ZipFile zip = new ZipFile(newManifestFile);
-				newManifest = new HoNManifest(zip.getInputStream(zip.getEntry("manifest.xml")));
-				HoNManifest.DownloadChangeSet changeSet = new HoNManifest.DownloadChangeSet(oldManifest, newManifest);
+				newManifest = honData.new HoNManifest(zip.getInputStream(zip.getEntry("manifest.xml")));
+				//HoNManifest.DownloadChangeSet changeSet = new HoNManifest.DownloadChangeSet(oldManifest, newManifest);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

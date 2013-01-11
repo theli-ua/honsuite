@@ -27,7 +27,6 @@ import 	java.util.UUID;
 @ContextSingleton
 public class HoNData {
 	@Inject Context context;
-	SQLiteDatabase db = (new ManifestTableOpener()).getWritableDatabase();
 	
 	private static final String OS = "os";
 	private static final String VERSION = "version";
@@ -59,9 +58,6 @@ public class HoNData {
     		FILE_VERSION + " TEXT," +
     		"PRIMARY KEY (" + FILE_PATH + "," + FILE_VERSION + ");";
 	    		
-	    
-	
-
 	private class ManifestTableOpener extends SQLiteOpenHelper
 	{
 		private static final int DATABASE_VERSION = 2;
@@ -108,6 +104,7 @@ public class HoNData {
 		String arch;
 		String version;
 		String table;
+		private final SQLiteDatabase db; 
 		static final String _osAttrName = "os";
 		static final String _versionAttrName = "version";
 		static final String _pathAttrName = "path";
@@ -123,6 +120,7 @@ public class HoNData {
 			this.arch = null;
 			this.version = null;
 			this.table = null;
+			this.db = null;
 		}
 
 		//opening element tag
@@ -147,7 +145,7 @@ public class HoNData {
 				}
 				else
 				{
-					this.table = UUID.randomUUID().toString();
+					this.table = String.format("manifest%s%s%s", this.os,this.arch,this.version);
 					db.execSQL(String.format(FILES_TABLE_CREATE, this.table));
 				}
 			}
@@ -162,9 +160,21 @@ public class HoNData {
 				db.insert(this.table, null, vals);
 			}
 		}
+		
+		@Override
+		public void endDocument()
+		{
+			ContentValues values = new ContentValues();
+			values.put(OS, this.os);
+			values.put(VERSION, this.version);
+			values.put(MANIFESTS_REFERENCE, this.table);
+			values.put(ARCH, this.arch);
+			db.insert(MANIFESTS_TABLE_NAME, null, values);
+		}
 
 		public HoNManifest(InputStream in)
 		{
+			this.db = (new ManifestTableOpener()).getWritableDatabase();
 			//this.files = new ArrayList<ManifestEntry>();
 			try {
 				SAXParserFactory _f = SAXParserFactory.newInstance();
