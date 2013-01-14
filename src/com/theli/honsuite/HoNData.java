@@ -18,6 +18,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
 
 
 import com.google.inject.Inject;
@@ -56,7 +57,7 @@ public class HoNData {
     		FILE_ZIPSIZE + " INTEGER," +
     		FILE_CHECKSUM + " CHECKSUM," +
     		FILE_VERSION + " TEXT," +
-    		"PRIMARY KEY (" + FILE_PATH + "," + FILE_VERSION + ");";
+    		"PRIMARY KEY (" + FILE_PATH + "," + FILE_VERSION + "));";
 	    		
 	private class ManifestTableOpener extends SQLiteOpenHelper
 	{
@@ -105,6 +106,7 @@ public class HoNData {
 		String version;
 		String table;
 		private final SQLiteDatabase db; 
+		private SQLiteStatement insertStatement;
 		static final String _osAttrName = "os";
 		static final String _versionAttrName = "version";
 		static final String _pathAttrName = "path";
@@ -114,6 +116,9 @@ public class HoNData {
 		static final String _zipsizeAttrName = "zipsize";
 		static final String _fileTag = "file";
 		static final String _manifestTag = "manifest";
+		static final String insertString = "INSERT INTO %s (" +
+				FILE_PATH + "," + FILE_CHECKSUM + "," +
+				FILE_VERSION + "," + FILE_SIZE + "," + FILE_ZIPSIZE + ") values (?,?,?,?,?);";
 		public HoNManifest()
 		{
 			this.os = null;
@@ -145,19 +150,23 @@ public class HoNData {
 				}
 				else
 				{
-					this.table = String.format("manifest%s%s%s", this.os,this.arch,this.version);
+					this.table = String.format("manifest%s%s%s", this.os,this.arch,this.version).replace('.', '_');
+					db.setLockingEnabled(false);
+					db.beginTransaction();
 					db.execSQL(String.format(FILES_TABLE_CREATE, this.table));
+					this.insertStatement = db.compileStatement(String.format(insertString, this.table));
 				}
 			}
 			else if (name.equals(_fileTag))
 			{
-				ContentValues vals = new ContentValues();
-				vals.put(FILE_CHECKSUM, atts.getValue(_checksumAttrName));
-				vals.put(FILE_PATH, atts.getValue(_pathAttrName));
-				vals.put(FILE_VERSION, atts.getValue(_versionAttrName));
-				vals.put(FILE_SIZE, Integer.decode(atts.getValue(_sizeAttrName)));
-				vals.put(FILE_ZIPSIZE, Integer.decode(atts.getValue(_zipsizeAttrName)));
-				db.insert(this.table, null, vals);
+				this.insertStatement.bindAllArgsAsStrings(new String[]{
+						atts.getValue(_pathAttrName),
+						atts.getValue(_checksumAttrName),				
+						atts.getValue(_versionAttrName),
+						atts.getValue(_sizeAttrName),
+						atts.getValue(_zipsizeAttrName),
+					});
+				this.insertStatement.executeInsert();
 			}
 		}
 		
@@ -170,6 +179,9 @@ public class HoNData {
 			values.put(MANIFESTS_REFERENCE, this.table);
 			values.put(ARCH, this.arch);
 			db.insert(MANIFESTS_TABLE_NAME, null, values);
+			db.setTransactionSuccessful();
+			db.endTransaction();
+			//db.setLockingEnabled(true);
 		}
 
 		public HoNManifest(InputStream in)
